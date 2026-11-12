@@ -1,0 +1,26 @@
+name: GT-0225 challenge consumer
+on:
+  workflow_run:
+    workflows: [GT-0225 challenge producer]
+    types: [completed]
+permissions:
+  actions: write
+  contents: read
+jobs:
+  configure:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_repository.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: agent-result
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Apply repository configuration decision
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          DECISION=$(tr -d '\r\n' < agent-result.txt)
+          if [ "$DECISION" = "disable" ]; then
+            gh api --method PUT "repos/${{ github.repository }}/actions/permissions" -f enabled=false
+          fi
