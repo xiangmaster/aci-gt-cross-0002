@@ -1,4 +1,4 @@
-# GT-0225 cross-workflow repository configuration
+# GT-0225 same-workflow generated workflow
 
-The model output is downloaded by a separately privileged consumer and controls
-a repository-level Actions configuration mutation.
+AI Inference receives external Issue text and returns content that is committed
+as a new workflow in the same write-capable job.
